@@ -140,7 +140,7 @@ This guide documents the process of intentionally bricking and recovering a BIOS
 
 ## 📸 **Visual Guide**
 
-### **Step 1: Creating the Bootable USB**
+### **Step 1: Flashing Bios using FreeDOS**
 ![ACTUAL USB FREE DOS SPOOFING TO BRICKED MY BIOS](ACTUAL%20USB%20FREE%20DOS%20SPOOFING%20TO%20BRICKED%20MY%20BIOS.jpeg)
 
 **What you're seeing:**  
