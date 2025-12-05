@@ -1,3 +1,103 @@
+Here's your enhanced README section that organizes your tutorial with your images clearly integrated:
+
+---
+
+# BIOS Recovery & TPM Clearing Guide for ASUS H110M-E M.2
+
+## 📋 Overview
+This guide documents the process of intentionally bricking and recovering a BIOS chip to clear TPM information and hardware IDs. We'll use a CH431A programmer with NeoProgrammer software to restore the BIOS to the latest version.
+
+## ⚠️ **Critical Warning**
+**This process will temporarily brick your motherboard** by downgrading to the earliest BIOS version, resulting in a black screen. Proceed only if you have the proper hardware and technical expertise.
+
+---
+
+## 🛠️ **Tools & Materials Required**
+
+### **Hardware:**
+- ASUS H110M-E M.2 Motherboard
+- CH341A/CH431A BIOS Programmer
+- USB flash drive (4GB+)
+- BIOS chip removal tools
+- Laptop/PC for programming
+
+### **Software:**
+- Rufus (for FreeDOS bootable USB)
+- NeoProgrammer
+- AFUDOS.exe
+- UEFITool
+- BIOS files:
+  - Lowest version: `H110M-E-M2-ASUS-0404.rom`
+  - Latest version: `H110M-E-M2-ASUS-4210.bin`
+
+---
+
+## 📸 **Visual Guide**
+
+### **Step 1: Creating the Bootable USB**
+![ACTUAL USB FREE DOS SPOOFING TO BRICKED MY BIOS](ACTUAL%20USB%20FREE%20DOS%20SPOOFING%20TO%20BRICKED%20MY%20BIOS.jpeg)
+
+**What you're seeing:**  
+A FreeDOS bootable USB created with Rufus. When booting, **select the USB name WITHOUT "UEFI"** to ensure legacy boot mode.
+
+### **Step 2: Removing the BIOS Chip**
+![REMOVE BIOS AND PUT IT TO CH431A PROGRAMMER](REMOVE%20BIOS%20AND%20PUT%20IT%20TO%20CH431A%20PROGRAMMER.jpeg)
+
+**What you're seeing:**  
+The BIOS chip carefully removed from the motherboard and placed in the CH431A programmer socket. The background shows the motherboard with the empty BIOS chip location.
+
+### **Step 3: Connecting the Programmer**
+![CONNECT CH431A TO LAPTOP TO REPROGRAM BIOS](CONNECT%20CH431A%20TO%20LAPTOP%20TO%20REPROGRAM%20BIOS.jpeg)
+
+**What you're seeing:**  
+The CH431A programmer connected to a laptop, ready to run NeoProgrammer software for BIOS chip reprogramming.
+
+### **Step 4: Reprogramming the BIOS**
+![NEOPROGRAMMER SOFTWARE](NEOPROGRAMMER%20SOFTWARE.png)
+
+**What you're seeing:**  
+NeoProgrammer software interface showing the process of reprogramming the bricked BIOS chip. We use this to flash the latest BIOS version after intentionally breaking the old one to clear TPM and hardware IDs.
+
+---
+
+## 🔄 **Process Flow**
+
+1. **Create FreeDOS USB** → Flash earliest BIOS (causes intentional brick)
+2. **Remove BIOS chip** → Extract from motherboard
+3. **Connect to CH431A** → Hook up to laptop/PC
+4. **Use NeoProgrammer** → Flash latest BIOS version
+5. **Reinstall chip** → Test boot with cleared TPM
+
+---
+
+## ⚡ **Quick Steps Summary**
+
+1. **Prepare USB** with FreeDOS and AFUDOS using Rufus
+2. **Boot from USB** (select non-UEFI option)
+3. **Flash oldest BIOS** → System bricks (expected)
+4. **Remove BIOS chip** from motherboard
+5. **Connect to CH431A programmer**
+6. **Program with NeoProgrammer** using latest BIOS
+7. **Reinstall chip** → Boot with cleared TPM
+
+---
+
+## 💡 **Why This Works**
+By forcing a downgrade to the earliest BIOS version, we trigger a complete TPM and hardware ID reset. The physical reprogramming then restores full functionality with the latest firmware, effectively wiping all previous security data.
+
+---
+
+## ⚠️ **Final Notes**
+- **Backup everything** before starting
+- **Ensure stable power** during programming
+- **Handle chips carefully** to avoid static damage
+- **This voids warranty** - proceed at your own risk
+- **Test thoroughly** after completion
+
+---
+
+*This guide is for educational purposes. Always follow proper ESD precautions and understand the risks involved in hardware modification.*
+
 # TPM Change Guide for ASUS H110M-E M.2
 
 ## ⚠️ WARNING
