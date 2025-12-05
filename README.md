@@ -1,206 +1,414 @@
-# TPM Change Guide for ASUS H110M-E M.2
 
-## ⚠️ WARNING
-**This process will cause a black screen** because we are downgrading the BIOS to the very first version. Proceed with caution and at your own risk.
+## For ASUS H110M-E M.2 Motherboards with Integrated TPM
 
-## Overview
-This guide explains how to clear TPM and perform a BIOS downgrade/upgrade process for ASUS H110M-E M.2 motherboards to reset TPM security settings.
+---
 
-## Prerequisites
+## 📋 **Executive Summary**
 
-### Hardware Requirements
-- USB drive (4GB minimum)
-- CH341A BIOS Programmer
-- ASUS H110M-E M.2 Motherboard
-- BIOS chip removal tools
+This guide provides a systematic approach to resetting hardware identity components (TPM 2.0/PTT and storage identifiers) for ASUS H110M-E M.2 motherboards. The process involves:
+1. **Software TPM clearance** through Windows and BIOS
+2. **Aggressive BIOS reprogramming** to reset firmware-based identifiers
+3. **Optional NVMe SSD serial number modification** for complete hardware anonymity
 
-### Software Requirements
-- Rufus (for creating DOS bootable USB)
-- NeoProgrammer
-- UEFI Tool
-- AFUDOS.exe
+**⚠️ IMPORTANT:** This process is designed for legitimate ownership transfer, hardware troubleshooting, or educational purposes only. Misuse may violate software license agreements or terms of service.
 
-### BIOS Files Needed
-- Lowest version: `H110M-E-M2-ASUS-0404.rom`
-- Latest version: `H110M-E-M2-ASUS-4210.bin`
+---
 
-## Preparation Steps
+## 🎯 **Objective**
 
-### Step 1: Clear TPM Settings
-1. Open `tpm.msc` in Windows
-2. Clear TPM from the management console
-3. Restart computer
+Reset the following hardware identifiers to factory defaults:
+- **Intel Platform Trust Technology (PTT) / fTPM state**
+- **Motherboard UUID and SMBIOS data**
+- **NVMe SSD serial number and identifiers**
+- **Secure Boot keys and NVRAM settings**
 
-### Step 2: Clear Secure Boot Keys
-1. Enter BIOS setup (Del key during boot)
-2. Navigate to Security/Secure Boot settings
-3. Clear Secure Boot keys
-4. Save and restart
+---
 
-## BIOS Modification Process
+## 📦 **Required Materials**
 
-### Step 3: Prepare DOS Bootable USB
-1. Use Rufus to format USB as DOS bootable
-2. Copy these files to the USB root:
-   - `AFUDOS.exe`
-   - `AUTOEXEC.BAT`
-   - `bios.rom` (converted from H110M-E-M2-ASUS-0404)
+### **Hardware Components:**
+| Item | Purpose | Approx. Cost |
+|------|---------|-------------|
+| CH341A BIOS Programmer | External BIOS chip programming | ₱120 |
+| USB 2.0/3.0 Drive (4GB+) | FreeDOS boot medium | ₱200 |
+| Fanxiang S500Pro 256GB NVMe SSD | Target storage for spoofing | ₱1,500 |
+| M.2 NVMe to USB Adapter | SSD programming interface | ₱130 |
+| BIOS Chip Removal Tools | SOP-8 chip extractor | ₱150 |
+| **Total Estimated Cost:** | | **₱2,100** |
 
-### AUTOEXEC.BAT Content
-```bat
+### **Software Tools:**
+| Software | Purpose | Source |
+|----------|---------|--------|
+| Rufus 3.2+ | Bootable USB creation | rufus.ie |
+| NeoProgrammer 2.2.0.10 | BIOS chip programming | Github |
+| UEFITool | BIOS file manipulation | Github |
+| AFUDOS Utility | BIOS flashing utility | ASUS |
+| map1202too | NVMe serial number modification | Github |
+| TPM Spoof Tools | Additional TPM utilities | Github |
+
+---
+
+## 📖 **Process Overview**
+
+### **Phase 1: Software Preparation & Initial Clearing**
+### **Phase 2: BIOS Identity Reset via Hardware Reprogramming**
+### **Phase 3: Storage Device Identifier Modification**
+### **Phase 4: System Validation & Testing**
+
+---
+
+## 🔧 **Phase 1: Initial Software Clearing**
+
+### **Step 1.1: Windows TPM Management**
+1. Open **Run Dialog** (`Win + R`)
+2. Type `tpm.msc` and press Enter
+3. In the TPM Management Console:
+   - Select **"Clear TPM..."** in the right-hand Actions pane
+   - Choose **"Restart now"** when prompted
+   - The system will reboot and clear the TPM/PTT module
+
+### **Step 1.2: BIOS/UEFI Configuration Reset**
+1. Enter BIOS Setup (`Del` key during boot)
+2. Navigate to **Security → Trusted Computing**
+3. Select **"Clear TPM"** or **"Reset TPM"**
+4. Navigate to **Boot → Secure Boot**
+5. Select **"Restore Factory Keys"** or **"Clear All Secure Boot Keys"**
+6. Save changes and exit (`F10`)
+
+### **Step 1.3: CMOS Clear (Physical Reset)**
+1. Power off the system and disconnect power cord
+2. Locate the CMOS battery on motherboard
+3. Remove battery for 5 minutes
+4. Short the CMOS jumper pins (CLRTC) for 10 seconds
+5. Reinstall battery and reconnect power
+
+---
+
+## 🧩 **Phase 2: BIOS Identity Reset via Hardware Reprogramming**
+
+### **Step 2.1: BIOS Files Preparation**
+1. Download official BIOS files from ASUS:
+   - Initial: `H110M-E-M2-ASUS-0404.CAP` (Oldest compatible)
+   - Target: `H110M-E-M2-ASUS-4210.CAP` (Latest stable)
+   
+2. Convert files using UEFITool:
+   ```bash
+   # Extract ROM from CAP files
+   UEFITool → Open CAP → Extract body → Save as .ROM
+   
+   # Convert latest version for programmer
+   H110M-E-M2-ASUS-4210.CAP → H110M-E-M2-ASUS-4210.BIN
+   ```
+
+### **Step 2.2: Create FreeDOS Bootable USB**
+1. Insert USB drive into working computer
+2. Open Rufus with Administrator privileges
+3. Configure settings:
+   - Device: [Your USB Drive]
+   - Boot selection: FreeDOS
+   - Partition scheme: MBR
+   - File system: FAT32
+4. Click **Start** and confirm formatting
+
+### **Step 2.3: Prepare BIOS Flashing Files**
+1. Copy these files to USB root directory:
+   - `AFUDOS.exe` (BIOS flashing utility)
+   - `BIOS.ROM` (converted from 0404 version)
+   - `AUTOEXEC.BAT` (automatic execution script)
+
+2. Create `AUTOEXEC.BAT` with this content:
+```batch
 @echo off
 cls
-afudos.exe bios.rom /GAN
+echo BIOS Downgrade in Progress...
+echo DO NOT POWER OFF!
+afudos.exe BIOS.ROM /GAN /N
+echo Flashing complete. System will power off.
 ```
 
-### Step 4: Convert BIOS Files
-1. Use UEFI Tool to convert:
-   - `H110M-E-M2-ASUS-0404` → `bios.rom` (for USB flashing)
-   - `H110M-E-M2-ASUS-4210` → `.bin` (for programmer flashing)
+### **Step 2.4: Execute BIOS Downgrade**
+1. Insert prepared USB into target system
+2. Boot system and enter Boot Menu (`F8`)
+3. **Critical**: Select USB device **WITHOUT "UEFI" prefix**
+4. System will automatically:
+   - Boot into FreeDOS
+   - Execute AFUDOS with downgrade BIOS
+   - Complete flashing process
+   - Result: **Black Screen (Expected)**
 
-## BIOS Flashing Process
+### **Step 2.5: Physical BIOS Chip Reprogramming**
+1. **Power off and disconnect all cables**
+2. **Extract BIOS chip** using SOP-8 extractor tool:
+   - Identify chip location (near CMOS battery)
+   - Gently lift with extractor tool
+   - Avoid bending pins
 
-### Step 5: Flash Lowest BIOS via USB
-1. Boot from the prepared USB drive
-2. The AUTOEXEC.BAT will automatically run AFUDOS
-3. Wait for flashing to complete
-4. System may black screen - this is expected
+3. **Connect to CH341A Programmer:**
+   - Align chip with pin 1 marker
+   - Lock chip securely in socket
+   - Connect USB to laptop
 
-### Step 6: Physical BIOS Chip Programming
-1. **Carefully remove the BIOS chip** from the motherboard
-2. Connect to CH341A programmer
-3. Open NeoProgrammer software
-4. Load the latest BIOS file (`H110M-E-M2-ASUS-4210.bin`)
-5. Execute in order:
-   - **Erase** the chip
-   - **Program** the new BIOS
-   - **Verify** the programming
-6. Reinstall BIOS chip on motherboard
+4. **Program with NeoProgrammer:**
+```
+[Software Interface Process]
+1. Open NeoProgrammer
+2. Select Chip: Winbond 25Q64FV (8MB)
+3. Click "Detect"
+4. Click "Read" (optional backup)
+5. Click "Erase" (full chip erase)
+6. Load File: H110M-E-M2-ASUS-4210.BIN
+7. Click "Program"
+8. Click "Verify"
+9. Status: "Verification Successful"
+```
 
-## Final Steps
+5. **Reinstall BIOS Chip:**
+   - Align pin 1 with motherboard marking
+   - Gently press into socket
+   - Ensure all pins are seated
+
+---
+
+## 💾 **Phase 3: Storage Device Identifier Modification**
+
+### **Step 3.1: NVMe SSD Programming Setup**
+1. Connect NVMe SSD to USB adapter
+2. Insert adapter into working computer
+3. Open Command Prompt as Administrator
+
+### **Step 3.2: Identify SSD Parameters**
+```bash
+# Using map1202too tool
+map1202too.exe -i
+
+# Expected output:
+# Device: Fanxiang S500Pro 256GB
+# Serial: xxxxxxxxxxxx
+# Model: FSxxxxxxxx
+# Firmware: xxxxxxxx
+```
+
+### **Step 3.3: Modify Serial Number**
+```bash
+# Generate random serial number
+# Format: 12 alphanumeric characters
+
+# Example command structure:
+map1202too.exe -s [NEW_SERIAL] -m [NEW_MODEL] -f [NEW_FIRMWARE]
+
+# Practical example:
+map1202too.exe -s F0A1B2C3D4E5 -m FANXIANG256 -f FSA001
+```
+
+### **Step 3.4: Verification**
+```bash
+# Confirm changes
+map1202too.exe -i
+
+# Expected result shows new identifiers
+```
+
+---
+
+## ✅ **Phase 4: System Validation**
+
+### **Step 4.1: Initial Boot Test**
 1. Reassemble all components
-2. Power on the system
-3. Enter BIOS setup to configure settings
-4. The TPM should now be cleared and ready for new configuration
+2. Connect minimal peripherals
+3. Power on system
+4. Observe:
+   - POST completion
+   - BIOS version display
+   - Boot device detection
 
-## ⚠️ Important Notes
-- Backup important data before starting
-- Ensure stable power supply during flashing
-- Follow ESD precautions when handling components
-- This process voids warranty
-- Incorrect flashing can brick your motherboard
+### **Step 4.2: BIOS Configuration**
+1. Enter BIOS Setup (`Del`)
+2. Check:
+   - **Main → System Information**: Verify new BIOS version
+   - **Security → TPM Configuration**: Should show "Available" or "Enabled"
+   - **Boot → Secure Boot**: Should be "Disabled" or "Setup Mode"
 
-## Success Indicators
-- System boots normally after final BIOS programming
-- TPM can be reconfigured in Windows
-- No security-related boot errors
+3. Configure optimal settings:
+   - Load Optimized Defaults
+   - Enable XMP for RAM (if applicable)
+   - Configure boot order
+   - Save and Exit (`F10`)
 
-## Troubleshooting
-- If system doesn't boot: double-check BIOS chip orientation
-- If TPM errors persist: repeat the entire process
-- For black screen issues: verify BIOS file compatibility
+### **Step 4.3: Windows Installation & Verification**
+1. Install fresh Windows 11/10
+2. During installation:
+   - Skip product key entry
+   - Choose "I don't have internet" for local account
+   - Create offline administrator account
 
----
+3. Post-installation checks:
+```powershell
+# Check TPM status
+Get-Tpm
 
-**Disclaimer**: This guide is for educational purposes. Perform these steps at your own risk. The author is not responsible for any damage to hardware.
+# Check motherboard information
+wmic baseboard get product,Manufacturer,version,serialnumber
 
+# Check disk information
+wmic diskdrive get serialnumber,model
 
+# Verify system uniqueness
+powershell "Get-WmiObject Win32_ComputerSystemProduct | Select-Object UUID"
+```
 
----
+### **Step 4.4: Functional Testing**
+1. **Windows Activation Test:**
+   - Check Activation status
+   - Attempt digital license transfer
 
-# BIOS Recovery & TPM Clearing Guide for ASUS H110M-E M.2
+2. **Software License Validation:**
+   - Install licensed software
+   - Verify new hardware detection
 
-## 📋 Overview
-This guide documents the process of intentionally bricking and recovering a BIOS chip to clear TPM information and hardware IDs. We'll use a CH431A programmer with NeoProgrammer software to restore the BIOS to the latest version.
-
-## ⚠️ **Critical Warning**
-**This process will temporarily brick your motherboard** by downgrading to the earliest BIOS version, resulting in a black screen. Proceed only if you have the proper hardware and technical expertise.
-
----
-
-## 🛠️ **Tools & Materials Required**
-
-### **Hardware:**
-- ASUS H110M-E M.2 Motherboard
-- CH341A/CH431A BIOS Programmer
-- USB flash drive (4GB+)
-- BIOS chip removal tools
-- Laptop/PC for programming
-
-### **Software:**
-- Rufus (for FreeDOS bootable USB)
-- NeoProgrammer
-- AFUDOS.exe
-- UEFITool
-- BIOS files:
-  - Lowest version: `H110M-E-M2-ASUS-0404.rom`
-  - Latest version: `H110M-E-M2-ASUS-4210.bin`
-
----
-
-## 📸 **Visual Guide**
-
-### **Step 1: Flashing Bios using FreeDOS**
-![ACTUAL USB FREE DOS SPOOFING TO BRICKED MY BIOS](ACTUAL%20USB%20FREE%20DOS%20SPOOFING%20TO%20BRICKED%20MY%20BIOS.jpeg)
-
-**What you're seeing:**  
-When booting, **select the USB name WITHOUT "UEFI"** to ensure legacy boot mode.
-
-### **Step 2: Removing the BIOS Chip**
-![REMOVE BIOS AND PUT IT TO CH431A PROGRAMMER](REMOVE%20BIOS%20AND%20PUT%20IT%20TO%20CH431A%20PROGRAMMER.jpeg)
-
-**What you're seeing:**  
-The BIOS chip carefully removed from the motherboard and placed in the CH431A programmer socket. The background shows the motherboard with the empty BIOS chip location.
-
-### **Step 3: Connecting the Programmer**
-![CONNECT CH431A TO LAPTOP TO REPROGRAM BIOS](CONNECT%20CH431A%20TO%20LAPTOP%20TO%20REPROGRAM%20BIOS.jpeg)
-
-**What you're seeing:**  
-The CH431A programmer connected to a laptop, ready to run NeoProgrammer software for BIOS chip reprogramming.
-
-### **Step 4: Reprogramming the BIOS**
-![NEOPROGRAMMER SOFTWARE](NEOPROGRAMMER%20SOFTWARE.png)
-
-**What you're seeing:**  
-NeoProgrammer software interface showing the process of reprogramming the bricked BIOS chip. We use this to flash the latest BIOS version after intentionally breaking the old one to clear TPM and hardware IDs.
+3. **Performance Testing:**
+   - Run stress tests
+   - Verify stability
+   - Check temperatures
 
 ---
 
-## 🔄 **Process Flow**
+## 📊 **Expected Results & Verification Matrix**
 
-1. **Create FreeDOS USB** → Flash earliest BIOS (causes intentional brick)
-2. **Remove BIOS chip** → Extract from motherboard
-3. **Connect to CH431A** → Hook up to laptop/PC
-4. **Use NeoProgrammer** → Flash latest BIOS version
-5. **Reinstall chip** → Test boot with cleared TPM
-
----
-
-## ⚡ **Quick Steps Summary**
-
-1. **Prepare USB** with FreeDOS and AFUDOS using Rufus
-2. **Boot from USB** (select non-UEFI option)
-3. **Flash oldest BIOS** → System bricks (expected)
-4. **Remove BIOS chip** from motherboard
-5. **Connect to CH431A programmer**
-6. **Program with NeoProgrammer** using latest BIOS
-7. **Reinstall chip** → Boot with cleared TPM
+| Component | Before Procedure | After Procedure | Verification Method |
+|-----------|-----------------|-----------------|-------------------|
+| TPM/PTT State | Owned/Cleared | Factory Default | `tpm.msc` |
+| Motherboard UUID | Original Serial | New/Generic | `wmic baseboard` |
+| BIOS Version | Latest (4210) | Latest (4210) | BIOS Splash Screen |
+| Secure Boot | Custom Keys | Factory Default | BIOS Setup |
+| SSD Serial | Original | Modified | `map1202too -i` |
+| Windows Activation | Linked to old HW | Not Activated | Settings → Activation |
 
 ---
 
-## 💡 **Why This Works**
-By forcing a downgrade to the earliest BIOS version, we trigger a complete TPM and hardware ID reset. The physical reprogramming then restores full functionality with the latest firmware, effectively wiping all previous security data.
+## ⚠️ **Critical Considerations & Warnings**
+
+### **Legal & Ethical Implications:**
+1. **Software Licensing**: Resetting hardware identifiers may violate software license agreements
+2. **Warranty Voidance**: Physical BIOS chip removal voids manufacturer warranty
+3. **Regulatory Compliance**: Some jurisdictions restrict hardware modification
+4. **Ethical Use**: Intended for legitimate ownership transfer only
+
+### **Technical Risks:**
+1. **Permanent Damage**: Incorrect chip handling can destroy motherboard
+2. **Boot Failure**: Improper programming can brick system
+3. **Data Loss**: All data on target SSD will be erased
+4. **Compatibility Issues**: Modified hardware may have driver conflicts
+
+### **Safety Precautions:**
+1. **ESD Protection**: Use anti-static wrist strap and mat
+2. **Power Safety**: Disconnect all power sources before hardware work
+3. **Backup Priority**: Backup existing BIOS before modification
+4. **Tool Quality**: Use proper tools to avoid physical damage
 
 ---
 
-## ⚠️ **Final Notes**
-- **Backup everything** before starting
-- **Ensure stable power** during programming
-- **Handle chips carefully** to avoid static damage
-- **This voids warranty** - proceed at your own risk
-- **Test thoroughly** after completion
+## 🆘 **Troubleshooting Guide**
+
+### **Common Issues & Solutions:**
+
+| Problem | Possible Cause | Solution |
+|---------|---------------|----------|
+| Black screen after USB flash | Expected behavior | Proceed to chip programming |
+| CH341A not detected | Driver issues | Install correct USB drivers |
+| Programming fails | Chip not detected | Check chip orientation/socket |
+| System won't POST | BIOS chip issue | Re-seat chip, verify programming |
+| Windows activation fails | Hardware hash persists | Repeat Phase 2 completely |
+
+### **Recovery Procedures:**
+1. **BIOS Recovery Mode**: Some ASUS boards support USB BIOS Flashback
+2. **Secondary BIOS Chip**: If available, switch to backup chip
+3. **Professional Repair**: Contact motherboard repair service if needed
 
 ---
 
-*This guide is for educational purposes. Always follow proper ESD precautions and understand the risks involved in hardware modification.*
+## 📈 **Success Metrics**
 
+The procedure is successful when:
+1. ✅ System boots to Windows without errors
+2. ✅ TPM shows as "Ready" or "Ownable" state
+3. ✅ Windows Activation shows "Not Activated"
+4. ✅ Software licenses recognize as "new hardware"
+5. ✅ System passes 24-hour stability test
+6. ✅ All modified components report new identifiers
+
+---
+
+## 🔍 **Advanced Notes for Technical Users**
+
+### **Understanding the Technical Basis:**
+1. **Intel PTT Architecture**: Firmware-based TPM 2.0 implementation stored in SPI flash
+2. **SMBIOS Structure**: DMI data stored in flash, modifiable via programming
+3. **NVMe Identify Controller**: Serial number field in controller accessible via vendor commands
+4. **Hardware Hash Generation**: Windows uses multiple hardware measurements for activation
+
+### **Alternative Approaches:**
+1. **Intel Flash Programming Tool (FPT)**: Can modify ME region if accessible
+2. **BIOS Modding**: Direct modification of SMBIOS tables in BIOS file
+3. **Hardware Emulation**: Virtual TPM solutions for testing
+
+### **Limitations:**
+1. **MAC Addresses**: Network controller identifiers remain unchanged
+2. **Intel ME Region**: May retain unique identifiers if not fully cleared
+3. **Other Components**: GPU, CPU, RAM have their own identifiers
+
+---
+
+## 📚 **References & Further Reading**
+
+1. **ASUS H110M-E M.2 Technical Documentation**
+2. **Intel Platform Trust Technology SDK**
+3. **TPM 2.0 Specification** (Trusted Computing Group)
+4. **NVMe Base Specification 1.4** (Serial Number modification)
+5. **UEFI Specification 2.9** (SMBIOS structure)
+
+---
+
+## 📞 **Support & Disclaimer**
+
+### **Support Channels:**
+- ASUS Technical Support: Official manufacturer support
+- Hardware Forums: Community troubleshooting assistance
+- Professional Services: Certified repair technicians
+
+### **Legal Disclaimer:**
+```
+This guide is provided for EDUCATIONAL PURPOSES ONLY. The author assumes 
+NO RESPONSIBILITY for any damage, data loss, legal issues, or warranty 
+voidance resulting from following this procedure. Users assume all risks 
+associated with hardware modification.
+
+This procedure may violate software license agreements, terms of service, 
+or local regulations. Consult with legal counsel before proceeding if 
+uncertain about compliance requirements.
+
+By proceeding, you acknowledge understanding and acceptance of all risks 
+and responsibilities associated with this hardware modification process.
+```
+
+---
+
+## 🎯 **Quick-Start Checklist**
+
+- [ ] Backup all important data
+- [ ] Gather all required tools and components
+- [ ] Download and verify BIOS files
+- [ ] Clear TPM via Windows and BIOS
+- [ ] Create FreeDOS USB with AFUDOS
+- [ ] Perform BIOS downgrade (expect black screen)
+- [ ] Extract and program BIOS chip with CH341A
+- [ ] Modify NVMe serial number with map1202too
+- [ ] Reassemble and test system
+- [ ] Verify all identifiers changed
+- [ ] Perform stability testing
+
+---
+
+**Document Version:** 1.0  
+**Last Updated:** October 2024  
+**Applicability:** ASUS H110M-E M.2 Motherboards  
+**Complexity Level:** Advanced/Technical
