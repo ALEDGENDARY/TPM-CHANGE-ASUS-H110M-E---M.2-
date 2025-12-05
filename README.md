@@ -88,7 +88,7 @@ Reset the following hardware identifiers to factory defaults:
 
 ### **Step 2.1: BIOS Files Preparation**
 1. Download official BIOS files from ASUS:
-   - Initial: `H110M-E-M2-ASUS-0404.CAP` (Oldest compatible)
+   - Initial: `H110M-E-M2-ASUS-0404.CAP` (Oldest incompatible)
    - Target: `H110M-E-M2-ASUS-4210.CAP` (Latest stable)
    
 2. Convert files using UEFITool:
